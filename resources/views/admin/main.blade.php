@@ -29,10 +29,11 @@
         <!-- summernote -->
         <link rel="stylesheet" href="/admin_assets/plugins/summernote/summernote-bs4.min.css">
         <!-- Tinymce dokumentáció (textarea)-->
-        <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+        <script src="https://cdn.tiny.cloud/1/5iot9drmw6l6zu3r7jlgvblhvmgj29g73y0qtuxa9hoh0fyb/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
         <script>
             tinymce.init({
-                selector: '#mytextarea'
+                selector: '#message',
+                language: 'hu_HU',
             });
         </script>
     </head>
