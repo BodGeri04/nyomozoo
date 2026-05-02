@@ -59,7 +59,6 @@ Route::get('/website/kapcsolat', [HomeController::class, 'kapcsolat']);
 Route::post('/website/kapcsolat', [HomeController::class, 'kapcsolatEmail']);
 Route::resource('/website/velemeny', FeedBackController::class);
 Route::get('/website/velemeny', [FeedBackController::class, 'index']);
-//Route::get('admin/maintenance', [HomeController::class, 'maintenance']);
 Route::get('admin/emailSend', [AdminController::class, 'MailsendAdmin']);
 Route::post('admin/emailSend', [AdminController::class, 'MailsendAdminPage']);
 Route::get('admin/deletedAds', [AdminController::class, 'deletedAds']);

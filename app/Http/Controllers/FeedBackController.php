@@ -37,17 +37,15 @@ class FeedBackController extends Controller
      */
     public function create(Request $request)
     {
-        if (Feedback::where('user_id', Auth::user()->id)->count() == 0 || User::where('id', Auth::user()->id)->where('Admin', 1)->count() == 1){
-        if (!advertisement::where('user_id', Auth::user()->id)->count()==0 || User::where('id', Auth::user()->id)->where('Admin', 1)->count() == 1){
-            $user_id = $request->get('user_id');
-            $person = Auth::user($user_id);
-            return view('website.velemeny')->with('mode', 'create')->with('person', $person);
-        }
-        else
-        return redirect('website/home')->with('error','Nincs jogod véleményt írni, amíg nem töltöttél fel legalább egy hirdetést!');
-        }
-        else
-        return redirect()->back()->with('error','Küldtél már visszajelzést korábban! Köszönjük!');
+        if (Feedback::where('user_id', Auth::user()->id)->count() == 0 || User::where('id', Auth::user()->id)->where('Admin', 1)->count() == 1) {
+            if (!advertisement::where('user_id', Auth::user()->id)->count() == 0 || User::where('id', Auth::user()->id)->where('Admin', 1)->count() == 1) {
+                $user_id = $request->get('user_id');
+                $person = Auth::user($user_id);
+                return view('website.velemeny')->with('mode', 'create')->with('person', $person);
+            } else
+                return redirect('website/home')->with('error', 'Nincs jogod véleményt írni, amíg nem töltöttél fel legalább egy hirdetést!');
+        } else
+            return redirect()->back()->with('error', 'Küldtél már visszajelzést korábban! Köszönjük!');
     }
     /**
      * Store a newly created resource in storage.
@@ -58,15 +56,20 @@ class FeedBackController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            ['stars' => 'required'],
-            ['stars.required' => 'Kérjük értékeld csillagokkal az oldalt.'],
+            'stars' => 'required',
+        ], [
+            'stars.required' => 'Kérjük értékeld csillagokkal az oldalt.',
         ]);
+
         $feedback = new Feedback;
         $feedback->user_id = Auth::user()->id;
-        $feedback->feedback_description=$request->feedback_description;
-        $feedback->stars=$request->stars;
+        $feedback->feedback_description = $request->feedback_description;
+        $feedback->stars = $request->stars;
         $feedback->save();
-        return redirect('website/home')->with('success', 'Sikeres! Köszönjük visszajelzésedet!')->with('feedback',$feedback);
+
+        return redirect('website/home')
+            ->with('success', 'Sikeres! Köszönjük visszajelzésedet!')
+            ->with('feedback', $feedback);
     }
 
     /**
@@ -111,7 +114,7 @@ class FeedBackController extends Controller
      */
     public function destroy($id)
     {
-        $feedbackdelete=Feedback::find($id);
+        $feedbackdelete = Feedback::find($id);
         $feedbackdelete->delete();
     }
 }

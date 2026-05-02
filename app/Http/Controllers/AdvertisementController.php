@@ -72,38 +72,43 @@ class AdvertisementController extends Controller
      */
     public function store(Request $request)
     {
-        $advertisement = new Advertisement;
-        $advertisement->user_id = Auth::user()->id;
-        $advertisement->title = $request->title;
-        $advertisement->name = $request->name;
-        $advertisement->disappeared = $request->disappeared;
-        $advertisement->zip_number = $request->zip_number;
-        $advertisement->animal_type = $request->animal_type;
-        $advertisement->comment = $request->comment;
-        $advertisement->characteristics = $request->characteristics;
-        $advertisement->phone_number = $request->phone_number;
-        $advertisement->pre_phone_number = $request->pre_phone_number;
-        $advertisement->chip = (($request->has('chip')) ? true : false);
-        $advertisement->sex = $request->sex;
-        $advertisement->search_find = $request->search_find;
-        $advertisement->approve = false;
-        $advertisement->status="inactive";
-        if ($request->hasFile('image_attach')) {
-            $imageName = time() . '.' . $request->image_attach->getClientOriginalExtension();
-            $request->image_attach->move(public_path('/assets/images/advertisement'), $imageName);
-            $advertisement->image_attach = $imageName;
-        } else {
-            $advertisement->image_attach = 'noimage.jpg';
+        try {
+            $advertisement = new Advertisement;
+            $advertisement->user_id = Auth::user()->id;
+            $advertisement->title = $request->title;
+            $advertisement->name = $request->name;
+            $advertisement->disappeared = $request->disappeared;
+            $advertisement->zip_number = $request->zip_number;
+            $advertisement->animal_type = $request->animal_type;
+            $advertisement->comment = $request->comment;
+            $advertisement->characteristics = $request->characteristics;
+            $advertisement->phone_number = $request->phone_number;
+            $advertisement->pre_phone_number = $request->pre_phone_number;
+            $advertisement->chip = (($request->has('chip')) ? true : false);
+            $advertisement->sex = $request->sex;
+            $advertisement->search_find = $request->search_find;
+            $advertisement->approve = false;
+            $advertisement->status="inactive";
+            if ($request->hasFile('image_attach')) {
+                $imageName = time() . '.' . $request->image_attach->getClientOriginalExtension();
+                $request->image_attach->move(public_path('/assets/images/advertisement'), $imageName);
+                $advertisement->image_attach = $imageName;
+            } else {
+                $advertisement->image_attach = 'noimage.jpg';
+            }
+            if ($advertisement->approve == 0) {
+                $administrator = User::where('Admin', 1)->first();
+                $advertisement->user_id == Auth::user()->id;
+                $usernotify = User::where('id', $advertisement->user_id)->first();
+                $usernotify->notify(new AdvertisementSentUser($advertisement));
+                $administrator->notify(new NewAdForAdmins($advertisement));
+            }
+            $advertisement->save();
+            return redirect('website/sajatHirdetesek')->with('success', 'Az Adminisztrátor(ok)hoz befutott a hirdetésed! Értesítünk, amint elfogadták.');
+        } catch (\Exception $e) {
+            \Log::error('Advertisement store error: '.$e->getMessage(), ['exception' => $e]);
+            return redirect()->back()->withInput()->with('error', 'Hiba történt a hirdetés mentése közben. Kérlek próbáld újra.');
         }
-        if ($advertisement->approve == 0) {
-            $administrator = User::where('Admin', 1)->first();
-            $advertisement->user_id == Auth::user()->id;
-            $usernotify = User::where('id', $advertisement->user_id)->first();
-            $usernotify->notify(new AdvertisementSentUser($advertisement));
-            $administrator->notify(new NewAdForAdmins($advertisement));
-        }
-        $advertisement->save();
-        return redirect('website/sajatHirdetesek')->with('success', 'Az Adminisztrátor(ok)hoz befutott a hirdetésed! Értesítünk, amint elfogadták.');
     }
     /**
      * Display the specified resource.
@@ -210,7 +215,7 @@ class AdvertisementController extends Controller
                 'text-align' => 2
             );
             PDF::write2DBarcode($url, 'QRCODE,H', 151, 220, 80, 50, $style, 'N');
-            PDF::Text(86, 271, '© 2022. Nyomozoo.hu');
+            PDF::Text(86, 271, '© 2026. Nyomozoo.hu');
             // sajathirdetes is the name of the PDF downloading
             PDF::Output('sajathirdetes_nyomozoo_hu.pdf');
         } else
